@@ -1,12 +1,13 @@
 import {
   DragDropContext,
-  Draggable,
   Droppable,
   DropResult,
 } from "@hello-pangea/dnd";
 import { useState } from "react";
 import { styled } from "styled-components";
 import useSWR from "swr";
+import DraggableCard from "./components/DraggableCard";
+import { IKanbanItem } from "./interfaces/kanban.interface";
 
 const AppContainer = styled.div`
   display: flex;
@@ -72,16 +73,6 @@ const Board = styled.div`
   background-color: #00b9d6;
 `;
 
-const Card = styled.div`
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #fff;
-
-  & + & {
-    margin-top: 10px;
-  }
-`;
-
 const PopupWrap = styled.div`
   position: fixed;
   top: 0;
@@ -117,11 +108,6 @@ const AddPopupButton = styled(PopupButton)`
 const CancelPopupButton = styled(PopupButton)`
   background-color: #ff543d;
 `;
-
-interface IKanbanItem {
-  id: string;
-  content: string;
-}
 
 const fetchItem = (): IKanbanItem[] => {
   const storedItem = localStorage.getItem("kanbanItem");
@@ -172,7 +158,7 @@ function App() {
       };
       const updatedItem = [...kanbanItem, newItemData];
 
-      localStorage.setItem("IKanbanItem", JSON.stringify(updatedItem));
+      localStorage.setItem("kanbanItem", JSON.stringify(updatedItem));
       mutate(updatedItem, false);
       setNewItem("");
       setIsPopup(false);
@@ -194,17 +180,7 @@ function App() {
             {(provided) => (
               <Board ref={provided.innerRef} {...provided.droppableProps}>
                 {kanbanItem.map((item: IKanbanItem, index: number) => (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(provided) => (
-                      <Card
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {item.content}
-                      </Card>
-                    )}
-                  </Draggable>
+                  <DraggableCard key={item.id} item={item} index={index} />
                 ))}
                 {provided.placeholder}
               </Board>
