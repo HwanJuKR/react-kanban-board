@@ -1,13 +1,9 @@
-import {
-  DragDropContext,
-  Droppable,
-  DropResult,
-} from "@hello-pangea/dnd";
-import { useState } from "react";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
+import { useMemo, useState } from "react";
 import { styled } from "styled-components";
 import useSWR from "swr";
 import DraggableCard from "./components/DraggableCard";
-import { IKanbanItem } from "./interfaces/kanban.interface";
+import { IKanbanItem, IStatus } from "./interfaces/kanban.interface";
 
 const AppContainer = styled.div`
   display: flex;
@@ -27,7 +23,6 @@ const TitleWrap = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 20px 0;
-  box-sizing: border-box;
 `;
 
 const Title = styled.h1`
@@ -73,6 +68,13 @@ const Board = styled.div`
   background-color: #00b9d6;
 `;
 
+const BoardTitle = styled.h3`
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+`;
+
 const PopupWrap = styled.div`
   position: fixed;
   top: 0;
@@ -96,9 +98,17 @@ const Popup = styled.div`
 `;
 
 const PopupButton = styled.button`
-  padding: 5px 8px;
+  padding: 4px 8px;
   color: #fff;
   border-radius: 10px;
+`;
+
+const StatusSelect = styled.select`
+  padding: 4px;
+`;
+
+const AddInput = styled.input`
+  padding: 4px;
 `;
 
 const AddPopupButton = styled(PopupButton)`
@@ -109,32 +119,66 @@ const CancelPopupButton = styled(PopupButton)`
   background-color: #ff543d;
 `;
 
-const fetchItem = (): IKanbanItem[] => {
-  const storedItem = localStorage.getItem("kanbanItem");
-
-  return storedItem ? JSON.parse(storedItem) : [];
+const fetchItem = (): {
+  toDo: IKanbanItem[];
+  inProgress: IKanbanItem[];
+  done: IKanbanItem[];
+} => {
+  return {
+    toDo: JSON.parse(localStorage.getItem("toDo") ?? "[]"),
+    inProgress: JSON.parse(localStorage.getItem("inProgress") ?? "[]"),
+    done: JSON.parse(localStorage.getItem("done") ?? "[]"),
+  };
 };
 
 function App() {
-  const { data: kanbanItem = [], mutate } = useSWR<IKanbanItem[]>("kanbanItem", fetchItem);
-  const [isPopup, setIsPopup] = useState(false);
-  const [newItem, setNewItem] = useState("");
+  const { data: kanbanItem = { toDo: [], inProgress: [], done: [] }, mutate } =
+    useSWR("kanbanItem", fetchItem);
+  const [isPopup, setIsPopup] = useState<boolean>(false);
+  const [newItem, setNewItem] = useState<string>("");
+  const [newStatus, setNewStatus] = useState<IStatus>("toDo");
+  const statusItem = useMemo(() => kanbanItem, [kanbanItem]);
 
-  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
+  const onDragEnd = ({ destination, source }: DropResult) => {
     if (
       !destination ||
       (destination.droppableId === source.droppableId &&
         destination.index === source.index)
-    ) {
+    )
       return;
+
+    const isValidStatus = (status: string): status is IStatus => {
+      return ["toDo", "inProgress", "done"].includes(status);
+    };
+
+    if (
+      isValidStatus(source.droppableId) &&
+      isValidStatus(destination.droppableId)
+    ) {
+      if (destination.droppableId === source.droppableId) {
+        // 같은 상태에서 위치 변경
+        const itemList = [...kanbanItem[source.droppableId]];
+        const moveItem = itemList[source.index];
+        itemList.splice(source.index, 1);
+        itemList.splice(destination.index, 0, moveItem);
+        localStorage.setItem(source.droppableId, JSON.stringify(itemList));
+      } else {
+        // 다른 상태로 이동
+        const sourceList = [...kanbanItem[source.droppableId]];
+        const destinationList = [...kanbanItem[destination.droppableId]];
+        const moveItem = sourceList[source.index];
+        sourceList.splice(source.index, 1);
+        destinationList.splice(destination.index, 0, moveItem);
+        moveItem.status = destination.droppableId;
+        localStorage.setItem(source.droppableId, JSON.stringify(sourceList));
+        localStorage.setItem(
+          destination.droppableId,
+          JSON.stringify(destinationList)
+        );
+      }
+
+      mutate(fetchItem(), false);
     }
-
-    const updatedItem = Array.from(kanbanItem);
-    const [movedItem] = updatedItem.splice(source.index, 1);
-    updatedItem.splice(destination.index, 0, movedItem);
-
-    localStorage.setItem("kanbanItem", JSON.stringify(updatedItem));
-    mutate(updatedItem, false);
   };
 
   const handlePopupOpen = () => {
@@ -146,8 +190,10 @@ function App() {
   };
 
   const handleAllDel = () => {
-    localStorage.removeItem("kanbanItem");
-    mutate([], false);
+    ["toDo", "inProgress", "done"].forEach((status) =>
+      localStorage.removeItem(status)
+    );
+    mutate({ toDo: [], inProgress: [], done: [] }, false);
   };
 
   const handleAddItem = () => {
@@ -155,14 +201,25 @@ function App() {
       const newItemData: IKanbanItem = {
         id: `${Date.now()}`,
         content: newItem,
+        status: newStatus,
       };
-      const updatedItem = [...kanbanItem, newItemData];
 
-      localStorage.setItem("kanbanItem", JSON.stringify(updatedItem));
-      mutate(updatedItem, false);
+      const updatedItems = [...kanbanItem[newStatus], newItemData];
+      localStorage.setItem(newStatus, JSON.stringify(updatedItems));
+
+      mutate(fetchItem(), false);
       setNewItem("");
+      setNewStatus("toDo");
       setIsPopup(false);
     }
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setNewStatus(e.target.value as IStatus);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewItem(e.target.value);
   };
 
   return (
@@ -176,30 +233,42 @@ function App() {
       </TitleWrap>
       <DragDropContext onDragEnd={onDragEnd}>
         <BoardWrap>
-          <Droppable droppableId="droppable">
-            {(provided) => (
-              <Board ref={provided.innerRef} {...provided.droppableProps}>
-                {kanbanItem.map((item: IKanbanItem, index: number) => (
-                  <DraggableCard key={item.id} item={item} index={index} />
-                ))}
-                {provided.placeholder}
-              </Board>
-            )}
-          </Droppable>
+          {(["toDo", "inProgress", "done"] as IStatus[]).map((status) => (
+            <Droppable key={status} droppableId={status}>
+              {(provided) => (
+                <Board ref={provided.innerRef} {...provided.droppableProps}>
+                  <BoardTitle>{status}</BoardTitle>
+                  {statusItem[status].map(
+                    (item: IKanbanItem, index: number) => (
+                      <DraggableCard key={item.id} item={item} index={index} />
+                    )
+                  )}
+                  {provided.placeholder}
+                </Board>
+              )}
+            </Droppable>
+          ))}
         </BoardWrap>
       </DragDropContext>
 
       {isPopup && (
         <PopupWrap>
           <Popup>
-            <input
+            <StatusSelect value={newStatus} onChange={handleStatusChange}>
+              <option value="toDo">toDo</option>
+              <option value="inProgress">inProgress</option>
+              <option value="done">done</option>
+            </StatusSelect>
+            <AddInput
               type="text"
               value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
+              onChange={handleInputChange}
               placeholder="내용을 입력해주세요"
             />
             <AddPopupButton onClick={handleAddItem}>추가</AddPopupButton>
-            <CancelPopupButton onClick={handlePopupClose}>취소</CancelPopupButton>
+            <CancelPopupButton onClick={handlePopupClose}>
+              취소
+            </CancelPopupButton>
           </Popup>
         </PopupWrap>
       )}
