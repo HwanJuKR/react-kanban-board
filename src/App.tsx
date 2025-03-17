@@ -3,15 +3,18 @@ import { useMemo, useState } from "react";
 import { styled } from "styled-components";
 import useSWR from "swr";
 import DraggableCard from "./components/DraggableCard";
-import { IKanbanItem, IStatus } from "./interfaces/kanban.interface";
+import {
+  IBoardProps,
+  IKanbanItem,
+  IStatus,
+} from "./interfaces/kanban.interface";
 
 const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 30px;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: #223856;
   box-sizing: border-box;
@@ -21,8 +24,8 @@ const TitleWrap = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 20px;
   width: 100%;
-  padding: 20px 0;
 `;
 
 const Title = styled.h1`
@@ -37,7 +40,11 @@ const ButtonWrap = styled.div`
 `;
 
 const TitleButton = styled.button`
-  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 36px;
   color: #fff;
   border-radius: 10px;
 `;
@@ -54,7 +61,7 @@ const BoardWrap = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
-  height: 100%;
+  height: calc(100% - 60px);
   gap: 10px;
   padding: 20px;
   border-radius: 5px;
@@ -62,13 +69,17 @@ const BoardWrap = styled.div`
   box-sizing: border-box;
 `;
 
-const Board = styled.div`
+const Board = styled.div<IBoardProps>`
   padding: 10px;
   border-radius: 5px;
-  background-color: #00b9d6;
+  background-color: ${(props) =>
+    props.$isDraggingOver ? "#00d4ec" : "#00b9d6"};
+  word-break: break-word;
+  overflow-y: scroll;
 `;
 
 const BoardTitle = styled.h3`
+  margin-bottom: 10px;
   font-size: 20px;
   font-weight: bold;
   color: #fff;
@@ -98,7 +109,11 @@ const Popup = styled.div`
 `;
 
 const PopupButton = styled.button`
-  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 24px;
   color: #fff;
   border-radius: 10px;
 `;
@@ -190,6 +205,9 @@ function App() {
   };
 
   const handleAllDel = () => {
+    const confirm = window.confirm("전체 리스트를 삭제하시겠습니까?");
+    if (!confirm) return;
+
     ["toDo", "inProgress", "done"].forEach((status) =>
       localStorage.removeItem(status)
     );
@@ -214,12 +232,35 @@ function App() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleAddItem();
+    }
+  };
+
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setNewStatus(e.target.value as IStatus);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewItem(e.target.value);
+  };
+
+  const handleDelItem = (id: string, status: IStatus) => {
+    console.log(kanbanItem[status]);
+    const confirm = window.confirm("항목을 샂게하시겠습니까?");
+    if (!confirm) return;
+
+    const updatedItem = {
+      ...kanbanItem,
+      [status]: kanbanItem[status].filter((item) => item.id !== id),
+    };
+
+    console.log(updatedItem);
+
+    localStorage.setItem(status, JSON.stringify(updatedItem[status]));
+
+    mutate(updatedItem, false);
   };
 
   return (
@@ -235,12 +276,22 @@ function App() {
         <BoardWrap>
           {(["toDo", "inProgress", "done"] as IStatus[]).map((status) => (
             <Droppable key={status} droppableId={status}>
-              {(provided) => (
-                <Board ref={provided.innerRef} {...provided.droppableProps}>
+              {(provided, snapshot) => (
+                <Board
+                  $isDraggingOver={snapshot.isDraggingOver}
+                  $isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
                   <BoardTitle>{status}</BoardTitle>
                   {statusItem[status].map(
                     (item: IKanbanItem, index: number) => (
-                      <DraggableCard key={item.id} item={item} index={index} />
+                      <DraggableCard
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        deleteCard={handleDelItem}
+                      />
                     )
                   )}
                   {provided.placeholder}
@@ -252,8 +303,8 @@ function App() {
       </DragDropContext>
 
       {isPopup && (
-        <PopupWrap>
-          <Popup>
+        <PopupWrap onClick={handlePopupClose}>
+          <Popup onClick={(e) => e.stopPropagation()}>
             <StatusSelect value={newStatus} onChange={handleStatusChange}>
               <option value="toDo">toDo</option>
               <option value="inProgress">inProgress</option>
@@ -263,6 +314,7 @@ function App() {
               type="text"
               value={newItem}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               placeholder="내용을 입력해주세요"
             />
             <AddPopupButton onClick={handleAddItem}>추가</AddPopupButton>
