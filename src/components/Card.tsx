@@ -1,9 +1,9 @@
 import { Draggable } from "@hello-pangea/dnd";
 import React from "react";
 import { styled } from "styled-components";
-import { IDragabbleCardProps } from "../interfaces/kanban.interface";
+import { ICardProps } from "../interfaces/kanban.interface";
 
-const Card = styled.div`
+const CardContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,11 +31,11 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
-const DraggableCard: React.FC<IDragabbleCardProps> = ({ item, index, deleteCard }) => {
+const Card: React.FC<ICardProps> = ({ item, index, deleteCard }) => {
   return (
     <Draggable draggableId={item.id} index={index}>
       {(provided) => (
-        <Card
+        <CardContent
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -44,10 +44,10 @@ const DraggableCard: React.FC<IDragabbleCardProps> = ({ item, index, deleteCard 
           <DeleteButton onClick={() => deleteCard(item.id, item.status)}>
             삭제
           </DeleteButton>
-        </Card>
+        </CardContent>
       )}
     </Draggable>
   );
 };
 
-export default React.memo(DraggableCard);
+export default React.memo(Card);
