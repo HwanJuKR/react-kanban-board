@@ -13,7 +13,7 @@ const BoardWrap = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
-  height: calc(100% - 60px);
+  height: calc(100% - 96px);
   gap: 10px;
   padding: 20px;
   border-radius: 5px;

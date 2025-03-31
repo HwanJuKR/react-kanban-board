@@ -1,5 +1,6 @@
 import { styled } from "styled-components";
 import Board from "./components/Board";
+import Footer from "./components/Footer";
 import Popup from "./components/Popup";
 import Title from "./components/Title";
 import { useKanban } from "./hooks/useKanban";
@@ -42,6 +43,9 @@ function App() {
         onDragEnd={onDragEnd}
         handleDelItem={handleDelItem}
       />
+
+      {/* 푸터 영역 */}
+      <Footer />
 
       {/* 칸반보드 추가 팝업 */}
       {isPopup && (
