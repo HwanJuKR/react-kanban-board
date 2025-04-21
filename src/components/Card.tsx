@@ -39,6 +39,7 @@ const Card: React.FC<ICardProps> = ({ item, index, deleteCard }) => {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          data-testid="card"
         >
           {item.content}
           <DeleteButton onClick={() => deleteCard(item.id, item.status)}>

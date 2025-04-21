@@ -74,8 +74,11 @@ const Popup: React.FC<IPopupProps> = ({
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="내용을 입력해주세요"
+          data-testid="addInput"
         />
-        <AddPopupButton onClick={handleAddItem}>추가</AddPopupButton>
+        <AddPopupButton onClick={handleAddItem} data-testid="addPopupButton">
+          추가
+        </AddPopupButton>
         <CancelPopupButton onClick={handlePopupClose}>취소</CancelPopupButton>
       </PopupContainer>
     </PopupWrap>,

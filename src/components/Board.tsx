@@ -54,6 +54,7 @@ const Board: React.FC<IBoardProps> = ({
                 $isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
                 ref={provided.innerRef}
                 {...provided.droppableProps}
+                data-testid={`${status}-column`}
               >
                 <BoardTitle>{status}</BoardTitle>
                 {statusItem[status].map((item: IKanbanItem, index: number) => (

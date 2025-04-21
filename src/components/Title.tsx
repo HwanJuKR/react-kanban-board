@@ -44,8 +44,12 @@ const Title: React.FC<ITitleProps> = ({ onAddClick, onDelClick }) => {
     <TitleWrap>
       <Heading>칸반보드</Heading>
       <ButtonWrap>
-        <AddButton onClick={onAddClick}>추가하기</AddButton>
-        <AllDelButton onClick={onDelClick}>초기화</AllDelButton>
+        <AddButton onClick={onAddClick} data-testid="addButton">
+          추가하기
+        </AddButton>
+        <AllDelButton onClick={onDelClick} data-testid="allDelButton">
+          초기화
+        </AllDelButton>
       </ButtonWrap>
     </TitleWrap>
   );
