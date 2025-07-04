@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import useSWR from "swr";
 import {
   IKanbanData,
@@ -17,7 +17,9 @@ const fetchItem = (): IKanbanData => {
       done: JSON.parse(localStorage.getItem("done") ?? "[]"),
     };
   } catch (error) {
-    alert("저장된 데이터를 불러오는 데 실패햿습니다. 잠시 후 다시 시도해 주세요");
+    alert(
+      "저장된 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요"
+    );
     return EMPTY_KANBAN_DATA;
   }
 };
@@ -50,13 +52,22 @@ export const useKanban = () => {
       );
       mutate(EMPTY_KANBAN_DATA, false);
     } catch (error) {
-      alert("삭제 중 오류가 발생하였습니다. 잠시 후 다시 시도해 주세요");
+      alert("삭제 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요");
     }
+  };
+
+  const handleStatusChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as IStatus;
+    setNewStatus(value);
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewItem(e.target.value);
   };
 
   const handleAddItem = () => {
     if (!newItem.trim()) {
-      alert("내용을 입력해주세요.");
+      alert("내용을 입력해 주세요.");
       return;
     }
 
@@ -88,7 +99,7 @@ export const useKanban = () => {
         ...kanbanItem,
         [status]: kanbanItem[status].filter((item) => item.id !== id),
       };
-  
+
       localStorage.setItem(status, JSON.stringify(updatedItem[status]));
       mutate(updatedItem, false);
     } catch (error) {
@@ -105,6 +116,8 @@ export const useKanban = () => {
     handlePopupOpen,
     handlePopupClose,
     handleAllDel,
+    handleStatusChange,
+    handleInputChange,
     handleAddItem,
     handleDelItem,
     setNewItem,

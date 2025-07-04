@@ -4,7 +4,6 @@ import Footer from "./components/Footer";
 import Popup from "./components/Popup";
 import Title from "./components/Title";
 import { useKanban } from "./hooks/useKanban";
-import { IStatus } from "./interfaces/kanban.interface";
 
 const AppContainer = styled.div`
   display: flex;
@@ -13,7 +12,7 @@ const AppContainer = styled.div`
   padding: 30px;
   width: 100%;
   height: 100vh;
-  background-color: #223856;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   box-sizing: border-box;
 `;
 
@@ -27,22 +26,22 @@ function App() {
     handlePopupOpen,
     handlePopupClose,
     handleAllDel,
+    handleStatusChange,
+    handleInputChange,
     handleAddItem,
     handleDelItem,
-    setNewItem,
-    setNewStatus,
   } = useKanban();
 
   return (
     <AppContainer>
       {/* 제목 영역 */}
-      <Title onAddClick={handlePopupOpen} onDelClick={handleAllDel} />
+      <Title onAdd={handlePopupOpen} onDelete={handleAllDel} />
 
       {/* 칸반보드 영역 */}
       <Board
         statusItem={statusItem}
         onDragEnd={onDragEnd}
-        handleDelItem={handleDelItem}
+        onDelItem={handleDelItem}
       />
 
       {/* 푸터 영역 */}
@@ -53,11 +52,11 @@ function App() {
         <Popup
           newStatus={newStatus}
           newItem={newItem}
-          handleStatusChange={(e) => setNewStatus(e.target.value as IStatus)}
-          handleInputChange={(e) => setNewItem(e.target.value)}
-          handleKeyDown={(e) => e.key === "Enter" && handleAddItem()}
-          handleAddItem={handleAddItem}
-          handlePopupClose={handlePopupClose}
+          onStatusChange={handleStatusChange}
+          onInputChange={handleInputChange}
+          onKeyDown={(e) => e.key === "Enter" && handleAddItem()}
+          onAddItem={handleAddItem}
+          onPopupClose={handlePopupClose}
         />
       )}
     </AppContainer>

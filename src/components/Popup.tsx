@@ -60,6 +60,7 @@ const PopupButton = styled.button`
   color: #fff;
   cursor: pointer;
   border: none;
+  border-radius: 10px;
   transition: all 0.2s ease;
 
   &:hover {
@@ -112,45 +113,44 @@ const AddInput = styled.input`
 `;
 
 const AddPopupButton = styled(PopupButton)`
-  background-color: #00b9d6;
+  background: linear-gradient(135deg, #00b9d6, #0099b8);
 
   &:hover:not(:disabled) {
-    background-color: #00a5c4;
+    background: linear-gradient(135deg, #00a5c4, #008aa6);
   }
 `;
 
 const CancelPopupButton = styled(PopupButton)`
-  background-color: #6c757d;
+  background: linear-gradient(135deg, #6c757d, #5a6268);
 
   &:hover:not(:disabled) {
-    background-color: #5a6268;
+    background: linear-gradient(135deg, #5a6268, #495057);
   }
 `;
 
 const Popup: React.FC<IPopupProps> = ({
   newStatus,
   newItem,
-  handleStatusChange,
-  handleInputChange,
-  handleKeyDown,
-  handleAddItem,
-  handlePopupClose,
+  onStatusChange,
+  onInputChange,
+  onKeyDown,
+  onAddItem,
+  onPopupClose,
 }) => {
   return ReactDOM.createPortal(
-    <PopupWrap onClick={handlePopupClose}>
+    <PopupWrap onClick={onPopupClose}>
       <PopupContainer onClick={(e) => e.stopPropagation()}>
         <PopupTitle>새 항목 추가</PopupTitle>
-
         <InputWrap>
           <Label htmlFor="statusSelect">상태</Label>
           <StatusSelect
             id="statusSelect"
             value={newStatus}
-            onChange={handleStatusChange}
+            onChange={onStatusChange}
           >
-            <option value="toDo">toDo</option>
-            <option value="inProgress">inProgress</option>
-            <option value="done">done</option>
+            <option value="toDo">할 일</option>
+            <option value="inProgress">진행 중</option>
+            <option value="done">완료</option>
           </StatusSelect>
         </InputWrap>
         <InputWrap>
@@ -159,18 +159,17 @@ const Popup: React.FC<IPopupProps> = ({
             id="addInput"
             type="text"
             value={newItem}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
+            onChange={onInputChange}
+            onKeyDown={onKeyDown}
             placeholder="내용을 입력해주세요"
             data-testid="addInput"
             autoFocus
           />
         </InputWrap>
-
         <ButtonWrap>
-          <CancelPopupButton onClick={handlePopupClose}>취소</CancelPopupButton>
+          <CancelPopupButton onClick={onPopupClose}>취소</CancelPopupButton>
           <AddPopupButton
-            onClick={handleAddItem}
+            onClick={onAddItem}
             disabled={!newItem.trim()}
             data-testid="addPopupButton"
           >
