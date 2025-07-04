@@ -3,13 +3,14 @@ import { DropResult } from "@hello-pangea/dnd";
 export type IStatus = "toDo" | "inProgress" | "done";
 
 export interface ITitleProps {
-  onAddClick: () => void;
-  onDelClick: () => void;
+  onAdd: () => void;
+  onDelete: () => void;
 }
 
 export interface IBoardContentProps {
   $isDraggingOver: boolean;
   $isDraggingFromThis: boolean;
+  id?: IStatus;
 }
 
 export interface IKanbanItem {
@@ -27,22 +28,37 @@ export interface IKanbanData {
 export interface IBoardProps {
   statusItem: IKanbanData;
   onDragEnd: (result: DropResult) => void;
-  handleDelItem: (id: string, status: IStatus) => void;
+  onDelItem: (id: string, status: IStatus) => void;
 }
 
 export interface ICardProps {
   item: IKanbanItem;
   index: number;
-  deleteCard: (id: string, status: IStatus) => void;
+  onDelete: (id: string, status: IStatus) => void;
 }
 
 export interface IPopupProps {
-  newStatus: string;
+  newStatus: IStatus;
   newItem: string;
-  handleStatusChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  handleAddItem: () => void;
-  handlePopupClose: () => void;
+  onStatusChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onAddItem: () => void;
+  onPopupClose: () => void;
 }
 
+export interface IColumnColorParams {
+  status: IStatus;
+  isDraggingOver: boolean;
+}
+
+export interface IColumnColor {
+  background: string;
+  title: string;
+}
+
+export interface IStatusColor {
+  toDo: IColumnColor;
+  inProgress: IColumnColor;
+  done: IColumnColor;
+}

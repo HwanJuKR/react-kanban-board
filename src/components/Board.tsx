@@ -7,6 +7,8 @@ import {
   IBoardContentProps,
   IKanbanItem,
   IStatus,
+  IStatusColor,
+  IColumnColorParams,
 } from "../interfaces/kanban.interface";
 
 const BoardWrap = styled.div`
@@ -16,57 +18,87 @@ const BoardWrap = styled.div`
   height: calc(100% - 96px);
   gap: 10px;
   padding: 20px;
-  border-radius: 5px;
-  background-color: #fff;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   box-sizing: border-box;
 `;
 
 const BoardContent = styled.div<IBoardContentProps>`
   padding: 10px;
-  border-radius: 5px;
-  background-color: ${(props) =>
-    props.$isDraggingOver ? "#00d4ec" : "#00b9d6"};
+  border-radius: 6px;
+  background-color: ${(props) => {
+    return columnColor({
+      status: props.id || "toDo",
+      isDraggingOver: props.$isDraggingOver,
+    }).background;
+  }};
   word-break: break-word;
-  opacity: ${(props) => (props.$isDraggingFromThis ? 0.7 : 1)};
-  transition: opacity 0.2s ease;
   overflow-y: scroll;
 `;
 
-const BoardTitle = styled.h3`
+const BoardTitle = styled.h3<{ id?: IStatus }>`
   margin-bottom: 10px;
   font-size: 20px;
   font-weight: bold;
-  color: #fff;
+  color: ${(props) => {
+    return columnColor({
+      status: props.id || "toDo",
+      isDraggingOver: false,
+    }).title;
+  }};
   text-align: center;
 `;
 
-const KANBAN_STATUS: IStatus[] = ["toDo", "inProgress", "done"];
+const kanbanStatus: IStatus[] = ["toDo", "inProgress", "done"];
+const boardTitle = {
+  toDo: "할 일",
+  inProgress: "진행 중",
+  done: "완료",
+};
 
-const Board: React.FC<IBoardProps> = ({
-  statusItem,
-  onDragEnd,
-  handleDelItem,
-}) => {
+const columnColor = ({ status, isDraggingOver }: IColumnColorParams) => {
+  const color: IStatusColor = {
+    toDo: {
+      background: isDraggingOver ? "#fbbf24" : "#fef3c7",
+      title: "#f59e0b",
+    },
+    inProgress: {
+      background: isDraggingOver ? "#60a5fa" : "#dbeafe",
+      title: "#3b82f6",
+    },
+    done: {
+      background: isDraggingOver ? "#34d399" : "#d1fae5",
+      title: "#10b981",
+    },
+  };
+
+  return color[status] || color.toDo;
+};
+
+const Board: React.FC<IBoardProps> = ({ statusItem, onDragEnd, onDelItem }) => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <BoardWrap>
-        {KANBAN_STATUS.map((status) => (
+        {kanbanStatus.map((status) => (
           <Droppable key={status} droppableId={status}>
             {(provided, snapshot) => (
               <BoardContent
+                id={status}
                 $isDraggingOver={snapshot.isDraggingOver}
                 $isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 data-testid={`${status}-column`}
               >
-                <BoardTitle>{status}</BoardTitle>
+                <BoardTitle id={status}>
+                  {boardTitle[status] || status}
+                </BoardTitle>
                 {statusItem[status].map((item: IKanbanItem, index: number) => (
                   <Card
                     key={item.id}
                     item={item}
                     index={index}
-                    deleteCard={handleDelItem}
+                    onDelete={onDelItem}
                   />
                 ))}
                 {provided.placeholder}

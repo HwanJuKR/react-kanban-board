@@ -11,9 +11,7 @@ const FooterWrap = styled.footer`
 `;
 
 const Footer: React.FC = () => {
-  return (
-    <FooterWrap>© 2025 Created by HwanJu</FooterWrap>
-  )
-}
+  return <FooterWrap>© 2025 Created by HwanJu</FooterWrap>;
+};
 
 export default Footer;

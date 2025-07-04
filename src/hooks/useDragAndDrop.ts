@@ -44,7 +44,7 @@ export const useDragAndDrop = (
             JSON.stringify(destinationList)
           );
         }
-  
+
         mutate(fetchItem(), false);
       } catch (error) {
         alert("항목 위치 변경에 실패했습니다. 잠시 후 다시 시도해 주세요");

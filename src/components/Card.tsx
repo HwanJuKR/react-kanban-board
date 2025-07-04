@@ -8,9 +8,9 @@ const CardContent = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px;
-  border-radius: 5px;
-  background-color: #fff;
-  gap: 5px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  gap: 6px;
 
   & + & {
     margin-top: 10px;
@@ -21,17 +21,18 @@ const DeleteButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
   flex-shrink: 0;
   width: 34px;
   height: 26px;
   color: #fff;
   border: none;
-  border-radius: 5px;
-  background-color: #6c757d;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   cursor: pointer;
 `;
 
-const Card: React.FC<ICardProps> = ({ item, index, deleteCard }) => {
+const Card: React.FC<ICardProps> = ({ item, index, onDelete }) => {
   return (
     <Draggable draggableId={item.id} index={index}>
       {(provided) => (
@@ -42,7 +43,7 @@ const Card: React.FC<ICardProps> = ({ item, index, deleteCard }) => {
           data-testid="card"
         >
           {item.content}
-          <DeleteButton onClick={() => deleteCard(item.id, item.status)}>
+          <DeleteButton onClick={() => onDelete(item.id, item.status)}>
             삭제
           </DeleteButton>
         </CardContent>
