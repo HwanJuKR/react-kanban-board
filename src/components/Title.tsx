@@ -36,7 +36,7 @@ const AddButton = styled(TitleButton)`
 `;
 
 const AllDelButton = styled(TitleButton)`
-  background-color: #ff543d;
+  background-color: #6c757d;
 `;
 
 const Title: React.FC<ITitleProps> = ({ onAddClick, onDelClick }) => {
