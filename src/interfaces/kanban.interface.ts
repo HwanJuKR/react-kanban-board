@@ -7,12 +7,6 @@ export interface ITitleProps {
   onDelClick: () => void;
 }
 
-export interface IBoardProps {
-  statusItem: Record<IStatus, IKanbanItem[]>;
-  onDragEnd: (result: DropResult) => void;
-  handleDelItem: (id: string, status: IStatus) => void;
-}
-
 export interface IBoardContentProps {
   $isDraggingOver: boolean;
   $isDraggingFromThis: boolean;
@@ -22,6 +16,18 @@ export interface IKanbanItem {
   id: string;
   content: string;
   status: IStatus;
+}
+
+export interface IKanbanData {
+  toDo: IKanbanItem[];
+  inProgress: IKanbanItem[];
+  done: IKanbanItem[];
+}
+
+export interface IBoardProps {
+  statusItem: IKanbanData;
+  onDragEnd: (result: DropResult) => void;
+  handleDelItem: (id: string, status: IStatus) => void;
 }
 
 export interface ICardProps {
@@ -39,3 +45,4 @@ export interface IPopupProps {
   handleAddItem: () => void;
   handlePopupClose: () => void;
 }
+

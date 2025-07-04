@@ -27,7 +27,7 @@ const DeleteButton = styled.button`
   color: #fff;
   border: none;
   border-radius: 5px;
-  background-color: #ff543d;
+  background-color: #6c757d;
   cursor: pointer;
 `;
 

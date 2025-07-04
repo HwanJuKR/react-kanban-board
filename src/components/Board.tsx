@@ -27,6 +27,8 @@ const BoardContent = styled.div<IBoardContentProps>`
   background-color: ${(props) =>
     props.$isDraggingOver ? "#00d4ec" : "#00b9d6"};
   word-break: break-word;
+  opacity: ${(props) => (props.$isDraggingFromThis ? 0.7 : 1)};
+  transition: opacity 0.2s ease;
   overflow-y: scroll;
 `;
 
@@ -38,6 +40,8 @@ const BoardTitle = styled.h3`
   text-align: center;
 `;
 
+const KANBAN_STATUS: IStatus[] = ["toDo", "inProgress", "done"];
+
 const Board: React.FC<IBoardProps> = ({
   statusItem,
   onDragEnd,
@@ -46,7 +50,7 @@ const Board: React.FC<IBoardProps> = ({
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <BoardWrap>
-        {(["toDo", "inProgress", "done"] as IStatus[]).map((status) => (
+        {KANBAN_STATUS.map((status) => (
           <Droppable key={status} droppableId={status}>
             {(provided, snapshot) => (
               <BoardContent

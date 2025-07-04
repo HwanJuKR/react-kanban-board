@@ -1,27 +1,35 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
-import { IKanbanItem, IStatus } from "../interfaces/kanban.interface";
+import {
+  IKanbanData,
+  IKanbanItem,
+  IStatus,
+} from "../interfaces/kanban.interface";
 import { useDragAndDrop } from "./useDragAndDrop";
 
-const fetchItem = (): {
-  toDo: IKanbanItem[];
-  inProgress: IKanbanItem[];
-  done: IKanbanItem[];
-} => {
-  return {
-    toDo: JSON.parse(localStorage.getItem("toDo") ?? "[]"),
-    inProgress: JSON.parse(localStorage.getItem("inProgress") ?? "[]"),
-    done: JSON.parse(localStorage.getItem("done") ?? "[]"),
-  };
+const EMPTY_KANBAN_DATA: IKanbanData = { toDo: [], inProgress: [], done: [] };
+
+const fetchItem = (): IKanbanData => {
+  try {
+    return {
+      toDo: JSON.parse(localStorage.getItem("toDo") ?? "[]"),
+      inProgress: JSON.parse(localStorage.getItem("inProgress") ?? "[]"),
+      done: JSON.parse(localStorage.getItem("done") ?? "[]"),
+    };
+  } catch (error) {
+    alert("저장된 데이터를 불러오는 데 실패햿습니다. 잠시 후 다시 시도해 주세요");
+    return EMPTY_KANBAN_DATA;
+  }
 };
 
 export const useKanban = () => {
-  const { data: kanbanItem = { toDo: [], inProgress: [], done: [] }, mutate } =
-    useSWR("kanbanItem", fetchItem);
+  const { data: kanbanItem = EMPTY_KANBAN_DATA, mutate } = useSWR(
+    "kanbanItem",
+    fetchItem
+  );
   const [isPopup, setIsPopup] = useState<boolean>(false);
   const [newItem, setNewItem] = useState<string>("");
   const [newStatus, setNewStatus] = useState<IStatus>("toDo");
-  const statusItem = useMemo(() => kanbanItem, [kanbanItem]);
   const { onDragEnd } = useDragAndDrop(kanbanItem, mutate, fetchItem);
 
   const handlePopupOpen = () => {
@@ -36,14 +44,23 @@ export const useKanban = () => {
     const confirm = window.confirm("전체 리스트를 삭제하시겠습니까?");
     if (!confirm) return;
 
-    ["toDo", "inProgress", "done"].forEach((status) =>
-      localStorage.removeItem(status)
-    );
-    mutate({ toDo: [], inProgress: [], done: [] }, false);
+    try {
+      ["toDo", "inProgress", "done"].forEach((status) =>
+        localStorage.removeItem(status)
+      );
+      mutate(EMPTY_KANBAN_DATA, false);
+    } catch (error) {
+      alert("삭제 중 오류가 발생하였습니다. 잠시 후 다시 시도해 주세요");
+    }
   };
 
   const handleAddItem = () => {
-    if (newItem.trim()) {
+    if (!newItem.trim()) {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+
+    try {
       const newItemData: IKanbanItem = {
         id: `${Date.now()}`,
         content: newItem,
@@ -57,31 +74,33 @@ export const useKanban = () => {
       setNewItem("");
       setNewStatus("toDo");
       setIsPopup(false);
+    } catch (error) {
+      alert("항목 추가 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요");
     }
   };
 
   const handleDelItem = (id: string, status: IStatus) => {
-    console.log(kanbanItem[status]);
     const confirm = window.confirm("항목을 삭제하시겠습니까?");
     if (!confirm) return;
 
-    const updatedItem = {
-      ...kanbanItem,
-      [status]: kanbanItem[status].filter((item) => item.id !== id),
-    };
-
-    console.log(updatedItem);
-
-    localStorage.setItem(status, JSON.stringify(updatedItem[status]));
-
-    mutate(updatedItem, false);
+    try {
+      const updatedItem = {
+        ...kanbanItem,
+        [status]: kanbanItem[status].filter((item) => item.id !== id),
+      };
+  
+      localStorage.setItem(status, JSON.stringify(updatedItem[status]));
+      mutate(updatedItem, false);
+    } catch (error) {
+      alert("항목 삭제 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요");
+    }
   };
 
   return {
     isPopup,
     newItem,
     newStatus,
-    statusItem,
+    statusItem: kanbanItem,
     onDragEnd,
     handlePopupOpen,
     handlePopupClose,

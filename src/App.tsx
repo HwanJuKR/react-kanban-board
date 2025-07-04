@@ -4,6 +4,7 @@ import Footer from "./components/Footer";
 import Popup from "./components/Popup";
 import Title from "./components/Title";
 import { useKanban } from "./hooks/useKanban";
+import { IStatus } from "./interfaces/kanban.interface";
 
 const AppContainer = styled.div`
   display: flex;
@@ -52,7 +53,7 @@ function App() {
         <Popup
           newStatus={newStatus}
           newItem={newItem}
-          handleStatusChange={(e) => setNewStatus(e.target.value as any)}
+          handleStatusChange={(e) => setNewStatus(e.target.value as IStatus)}
           handleInputChange={(e) => setNewItem(e.target.value)}
           handleKeyDown={(e) => e.key === "Enter" && handleAddItem()}
           handleAddItem={handleAddItem}
