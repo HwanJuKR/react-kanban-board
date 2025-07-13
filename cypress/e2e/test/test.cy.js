@@ -1,3 +1,4 @@
+/* global cy */
 describe("칸반보드 테스트", () => {
   beforeEach(() => {
     cy.visit("http://localhost:3000");

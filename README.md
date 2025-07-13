@@ -1,4 +1,4 @@
-# 리액트 칸반 보드 프로젝트
+# React 칸반 보드 프로젝트
 
 이 프로젝트는 **Create React App**을 기반으로 생성된 칸반 보드 애플리케이션입니다.  
 사용자는 작업을 추가, 삭제, 이동(드래그 앤 드롭)을 통해 작업 상태를 관리할 수 있으며,  
@@ -8,11 +8,12 @@
 
 ## 🛠 사용된 기술 스택
 
-- **React**: UI 라이브러리
-- **TypeScript**: 정적 타입을 지원하는 JavaScript
-- **Styled-Components**: CSS-in-JS 방식의 스타일링 도구
-- **Cypress**: E2E(End-to-End) 테스트 도구
-- **SWR**: React를 위한 데이터 패칭 라이브러리
+- **React**: ^19.0.0 - UI 라이브러리
+- **TypeScript**: ^4.9.5 - 정적 타입을 지원하는 JavaScript
+- **Styled-Components**: ^6.1.15 - CSS-in-JS 방식의 스타일링 도구
+- **SWR**: ^2.3.2 - React를 위한 데이터 패칭 라이브러리
+- **@hello-pangea/dnd**: ^18.0.1 - 드래그 앤 드롭 기능을 제공하는 라이브러리
+- **Cypress**: ^14.3.1 - E2E(End-to-End) 테스트 도구
 
 ---
 
@@ -29,35 +30,33 @@
 
 ### 1. 프로젝트 클론
 
-```
-git clone https://github.com/your-repo/react-kanban-board.git
+```bash
+git clone https://github.com/HwanJuKR/react-kanban-board
 cd react-kanban-board
 ```
 
 ### 2. 의존성 설치
 
-```
+```bash
 npm install
 ```
 
 ### 3. 개발 서버 실행
 
-```
+```bash
 npm start
-애플리케이션은 http://localhost:3000 에서 확인할 수 있습니다.
 ```
+애플리케이션은 http://localhost:3000 에서 확인할 수 있습니다.
 
 ### 4. E2E 테스트 실행 (Cypress)
 
 GUI 실행
-
-```
+```bash
 npm run cypress:open
 ```
 
 CLI 실행
-
-```
+```bash
 npm run cypress:run
 ```
 
@@ -92,11 +91,38 @@ react-kanban-board/
 │   ├── App.tsx                 # 메인 컴포넌트
 │   ├── index.tsx               # 엔트리 포인트
 │   └── react-app-env.d.ts      # React 환경 타입 정의
-├── .gitignore                  # Git에서 제외할 파일 목록
-├── package.json                # 프로젝트 설정 파일
-├── tsconfig.json               # TypeScript 설정 파일
-├── README.md                   # 프로젝트 설명 파일
-└── package-lock.json           # 의존성 잠금 파일
+├── cypress.config.ts                 # Cypress 설정 파일
+├── tsconfig.json                     # TypeScript 설정 파일
+├── package.json                      # 프로젝트 설정 파일
+├── package-lock.json                 # 의존성 잠금 파일
+└── README.md                         # 프로젝트 설명 파일
 ```
+
+---
+
+## 🎯 주요 특징
+
+### 드래그 앤 드롭 기능
+- @hello-pangea/dnd 라이브러리를 활용한 부드러운 드래그 앤 드롭
+- 작업 상태 간 자유로운 이동 가능
+
+### 상태 관리
+- 커스텀 훅을 통한 효율적인 상태 관리
+- SWR을 활용한 데이터 패칭 및 캐싱
+
+### 스타일링
+- Styled-Components를 활용한 CSS-in-JS 방식
+- 컴포넌트 기반 스타일링으로 유지보수성 향상
+
+---
+
+## 🧪 테스트
+
+프로젝트는 Cypress를 통한 E2E 테스트를 포함하고 있습니다:
+
+- **작업 추가/삭제 테스트**: 새로운 작업 생성 및 삭제 기능 확인
+- **초기화 버튼 테스트**: 초기화 버튼 기능 확인
+
+---
 
 감사합니다 :)
