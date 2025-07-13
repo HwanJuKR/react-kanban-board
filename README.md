@@ -31,7 +31,7 @@
 ### 1. 프로젝트 클론
 
 ```bash
-git clone https://github.com/HwanJuKR/react-kanban-board
+git clone https://github.com/HwanJuKR/react-kanban-board.git
 cd react-kanban-board
 ```
 
