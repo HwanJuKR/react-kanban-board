@@ -33,7 +33,7 @@ const BoardContent = styled.div<IBoardContentProps>`
     }).background;
   }};
   word-break: break-word;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 const BoardTitle = styled.h3<{ id?: IStatus }>`
